@@ -32,6 +32,10 @@ MANIFEST
 *.manifest
 *.spec
 
+# ChromaDB
+chroma_db/
+
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -56,7 +60,6 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -188,6 +191,15 @@ cython_debug/
 #  you could uncomment the following to ignore the entire vscode folder
 # .vscode/
 
+# JetBrains IDEs (PyCharm, IntelliJ, etc.)
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
 # Ruff stuff:
 .ruff_cache/
 
@@ -205,3 +217,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# logs
+logs/
+*.log
