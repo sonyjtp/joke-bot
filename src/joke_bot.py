@@ -1,3 +1,10 @@
+"""
+A simple joke-telling chatbot implemented using LangGraph, without any LLMs.
+This example demonstrates how to build an agentic state flow using LangGraph, where the bot can fetch jokes,
+change categories, and keep track of the jokes it has told. The bot uses the `pyjokes` library to fetch jokes based on
+user-selected categories and languages.
+"""
+
 from operator import add
 from typing import Annotated, Literal
 
@@ -6,6 +13,7 @@ from langgraph.constants import END
 from langgraph.graph import StateGraph
 from pydantic import BaseModel
 from pyjokes import get_joke
+from pyjokes.pyjokes import LANGUAGES, CATEGORIES
 
 
 class Joke(BaseModel):
@@ -15,8 +23,8 @@ class Joke(BaseModel):
 class JokeState(BaseModel):
     jokes: Annotated[list[Joke], add] = []  # Using built-in add operator
     jokes_choice: Literal["n", "c", "q"] = "n" # next, change, quit
-    category: str = "neutral"
-    language: str = "en"
+    category: CATEGORIES = "neutral"
+    language: LANGUAGES = "en"
     quit: bool = False
 
 def get_user_input(prompt: str) -> str:
