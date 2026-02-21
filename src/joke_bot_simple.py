@@ -5,71 +5,38 @@ change categories, and keep track of the jokes it has told. The bot uses the `py
 user-selected categories and languages.
 """
 
-from operator import add
-from typing import Annotated, Literal
+from typing import get_args
 
 from langchain_core.runnables import RunnableConfig
 from langgraph.constants import END
 from langgraph.graph import StateGraph
-from pydantic import BaseModel
 from pyjokes import get_joke
-from pyjokes.pyjokes import LANGUAGES, CATEGORIES
 
+from src.joke_state import CHOICES, JokeState, Joke
+from src.utils.joke_helper import get_user_input, update_language, exit_bot, print_category_menu_header, fetch_joke, \
+    route_choice
 
-class Joke(BaseModel):
-    text: str
-    category: str
-
-class JokeState(BaseModel):
-    jokes: Annotated[list[Joke], add] = []  # Using built-in add operator
-    jokes_choice: Literal["n", "c", "q"] = "n" # next, change, quit
-    category: CATEGORIES = "neutral"
-    language: LANGUAGES = "en"
-    quit: bool = False
-
-def get_user_input(prompt: str) -> str:
-    return input(prompt).strip().lower()
-
-def print_joke(joke: Joke):
-    """Print a joke with nice formatting."""
-    # print(f"\n📂 CATEGORY: {joke.category.upper()}\n")
-    print(f"\n😂 {joke.text}\n")
-    print("=" * 60)
 
 def print_menu_header(category: str, total_jokes: int):
     """Print a compact menu header."""
     print(f"🎭 Menu | Category: {category.upper()} | Jokes: {total_jokes}")
     print("-" * 50)
 
-def print_category_menu():
-    """Print a nicely formatted category selection menu."""
-    print("📂" + "=" * 58 + "📂")
-    print("    CATEGORY SELECTION")
-    print("=" * 50)
-
 
 # Nodes
 
 def show_menu(state: JokeState) -> dict:
     print_menu_header(state.category, len(state.jokes))
-    print("[n] 🎭 Next Joke  [c] 📂 Change Category  [q] 🚪 Quit")
+    print("[n] 🎭 Next Joke  [c] 📂 Change Category [l] 🌐 Change Language [r] 🔄 Reset  [q] ❌ Quit")
     choice = get_user_input("Your choice: ")
-    while choice not in ["n", "c", "q"]:
-        print("❌ Invalid choice. Please enter 'n', 'c', or 'q'.")
+    while choice not in get_args(CHOICES):
+        print("❌ Invalid choice. Please enter 'n', 'c', 'l', r' or 'q'.")
         choice = get_user_input("Your choice: ")
     return {"jokes_choice": choice}
 
-def fetch_joke(state: JokeState) -> dict:
-    # Placeholder for joke fetching logic
-    # In a real implementation, this would call an API or database
-    joke = get_joke(language=state.language, category=state.category)
-    new_joke = Joke(text=joke, category=state.category)
-    print_joke(new_joke)
-    return {"jokes": [new_joke]}  # LangGraph will use the add reducer to append this
-
 def update_category(state: JokeState) -> dict:
     categories = ["neutral", "chuck", "all"]
-    print_category_menu()
+    print_category_menu_header()
     print("Available categories: ")
     for i, cat in enumerate(categories):
         emoji = "🎯" if cat == "neutral" else "🥋" if cat == "chuck" else "🌟"
@@ -86,20 +53,15 @@ def update_category(state: JokeState) -> dict:
         print("❌ Invalid input. Please enter a number.")
         return {}
 
-def exit_bot(state: JokeState) -> dict:
-    print("👋 Goodbye!")
-    return {"quit": True}
+def reset_state(state: JokeState) -> dict:
+    print("🔄 Resetting joke history and settings to defaults.")
+    return {
+        "jokes": [],  # Clear joke history
+        "category": "neutral",  # Reset category
+        "language": "en",  # Reset language
+        "jokes_choice": "n"  # Reset choice to next joke
+    }
 
-def route_choice(state: JokeState) -> str:
-    if state.jokes_choice == "n":
-        return "fetch_joke"
-    elif state.jokes_choice == "c":
-        return "update_category"
-    elif state.jokes_choice == "q":
-        return "exit_bot"
-    else:
-        print("❌ Invalid choice. This should never happen.")
-        return ""
 
 # Build graph
 
@@ -110,6 +72,8 @@ def build_joke_bot_graph():
     workflow.add_node("show_menu", show_menu)
     workflow.add_node("fetch_joke", fetch_joke)
     workflow.add_node("update_category", update_category)
+    workflow.add_node("update_language", update_language)
+    workflow.add_node("reset_state", reset_state)
     workflow.add_node("exit_bot", exit_bot)
 
     # set entry point
@@ -122,6 +86,8 @@ def build_joke_bot_graph():
         path_map={
             "fetch_joke": "fetch_joke",
             "update_category": "update_category",
+            "update_language": "update_language",
+            "reset_state": "reset_state",
             "exit_bot": "exit_bot",
         }
     )
@@ -129,6 +95,8 @@ def build_joke_bot_graph():
     # define transitions after fetch and update
     workflow.add_edge("fetch_joke", "show_menu")
     workflow.add_edge("update_category", "show_menu")
+    workflow.add_edge("update_language", "show_menu")
+    workflow.add_edge("reset_state", "show_menu")
     workflow.add_edge("exit_bot", END)
 
     return workflow.compile()
@@ -148,7 +116,7 @@ def main():
     )
 
     print("\nJoke Bot Session Ended. Here are all the jokes you received:")
-    for idx, joke in enumerate(final_state.jokes, 1):
+    for idx, joke in enumerate(JokeState(**final_state).jokes, 1):
         print(f"{idx}. [{joke.category.upper()}] {joke.text}")
 
 
