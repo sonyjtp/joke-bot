@@ -15,6 +15,7 @@ class JokeState(BaseModel):
     choice:CHOICES  = "n"
     category: CATEGORIES = "neutral"
     language: LANGUAGES = "en"
+    repetition: bool = False
     quit: bool = False
 
 class AgenticJokeState(JokeState):

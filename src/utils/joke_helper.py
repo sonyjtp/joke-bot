@@ -67,6 +67,31 @@ def fetch_joke(state: JokeState) -> dict:
     print_joke(new_joke)
     return {"jokes": [new_joke]}  # LangGraph will use the add reducer to append this
 
+
+def extract_joke_from_response(response: str) -> str:
+    """
+    Extract the actual joke from the LLM response.
+    Removes preamble text like 'Here's a neutral developer joke:'
+    and keeps only the first joke.
+    """
+    lines = response.split('\n')
+    joke_lines = []
+
+    for line in lines:
+        line = line.strip()
+        # Skip empty lines and preamble
+        if not line or any(phrase in line.lower() for phrase in ["here's", "alternative", "or an"]):
+            continue
+        # Remove quotation marks if present
+        line = line.strip('"')
+        if line:
+            joke_lines.append(line)
+            # Stop after the first complete joke (usually 1-2 lines)
+            if len(joke_lines) >= 2:
+                break
+
+    return ' '.join(joke_lines) if joke_lines else response
+
 def exit_bot(_state: JokeState) -> dict:
     print("👋 Goodbye!")
     return {"quit": True}
