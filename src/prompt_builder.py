@@ -1,7 +1,7 @@
 from typing import Dict, Any, Optional
 
 
-from src.utils.str_utils import lowercase_first_char, format_to_str
+from utils.str_utils import lowercase_first_char, format_to_str
 
 
 def build_prompt_from_config(

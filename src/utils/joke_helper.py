@@ -7,11 +7,12 @@ CHOICE_FETCH_JOKE = "fetch_joke"
 CHOICE_UPDATE_CATEGORY = "update_category"
 CHOICE_UPDATE_LANGUAGE = "update_language"
 CHOICE_RESET_STATE = "reset_state"
+CHOICE_VIEW_CATALOG = "view_catalog"
 CHOICE_EXIT_BOT = "exit_bot"
 DECISION_APPROVED = "show_joke"
 DECISION_REJECTED = "fetch_joke"
 
-def get_user_input(prompt: str) -> str:
+def get_user_input_in_lowercase(prompt: str) -> str:
     return input(prompt).strip().lower()
 
 def print_category_menu_header():
@@ -38,6 +39,8 @@ def route_choice(state: JokeState) -> str:
             return CHOICE_UPDATE_LANGUAGE
         case "r":
             return CHOICE_RESET_STATE
+        case "b":
+            return CHOICE_VIEW_CATALOG
         case "q":
             return CHOICE_EXIT_BOT
         case _:
@@ -48,10 +51,10 @@ def update_language(_state: JokeState) -> dict:
     for i, lang in enumerate(JOKE_LANGUAGES):
         print(f"    {i}. {lang.upper()}")
     try:
-        choice = int(get_user_input("Select a language by number: "))
+        choice = int(get_user_input_in_lowercase("Select a language by number: "))
         while choice < 0 or choice >= len(JOKE_LANGUAGES):
              print("❌ Invalid choice. Please enter a valid number.")
-             choice = int(get_user_input("Select a language by number: "))
+             choice = int(get_user_input_in_lowercase("Select a language by number: "))
         selected_language = JOKE_LANGUAGES[choice]
         print(f"✅ Language changed to {selected_language.upper()}")
         return {"language": selected_language}

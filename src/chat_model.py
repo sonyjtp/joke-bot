@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from src.config import WRITER_MODEL, WRITER_TEMPERATURE, CRITIC_MODEL, CRITIC_TEMPERATURE
+from config import WRITER_MODEL, WRITER_TEMPERATURE, CRITIC_MODEL, CRITIC_TEMPERATURE
 
 
 class BaseModelConfig(BaseModel):

@@ -2,7 +2,7 @@ import os
 
 import yaml
 
-from src.config import CONFIG_FILE_NAME, CONFIG_DIR
+from config import CONFIG_FILE_NAME, CONFIG_DIR
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

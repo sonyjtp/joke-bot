@@ -2,8 +2,8 @@ import os
 
 from langchain_core.language_models import BaseChatModel
 
-from src.chat_model import BaseModelConfig
-from src.config import LLM_MAP, LLM_PROVIDERS
+from chat_model import BaseModelConfig
+from config import LLM_MAP, LLM_PROVIDERS
 
 
 def get_llm(model_config: BaseModelConfig) -> BaseChatModel:

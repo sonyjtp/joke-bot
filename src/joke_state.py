@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, Field
 from pyjokes.pyjokes import CATEGORIES, LANGUAGES
 
-CHOICES = Literal["n", "c", "l", "r", "q"]
+CHOICES = Literal["n", "c", "l", "b", "r", "q"]
 
 class Joke(BaseModel):
     text: str

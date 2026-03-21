@@ -13,7 +13,7 @@ from langgraph.graph import StateGraph
 from pyjokes import get_joke
 
 from src.joke_state import CHOICES, JokeState, Joke
-from src.utils.joke_helper import get_user_input, update_language, exit_bot, print_category_menu_header, fetch_joke, \
+from src.utils.joke_helper import get_user_input_in_lowercase, update_language, exit_bot, print_category_menu_header, fetch_joke, \
     route_choice
 
 
@@ -28,10 +28,10 @@ def print_menu_header(category: str, total_jokes: int):
 def show_menu(state: JokeState) -> dict:
     print_menu_header(state.category, len(state.jokes))
     print("[n] 🎭 Next Joke  [c] 📂 Change Category [l] 🌐 Change Language [r] 🔄 Reset  [q] ❌ Quit")
-    choice = get_user_input("Your choice: ")
+    choice = get_user_input_in_lowercase("Your choice: ")
     while choice not in get_args(CHOICES):
         print("❌ Invalid choice. Please enter 'n', 'c', 'l', r' or 'q'.")
-        choice = get_user_input("Your choice: ")
+        choice = get_user_input_in_lowercase("Your choice: ")
     return {"jokes_choice": choice}
 
 def update_category(state: JokeState) -> dict:
@@ -42,7 +42,7 @@ def update_category(state: JokeState) -> dict:
         emoji = "🎯" if cat == "neutral" else "🥋" if cat == "chuck" else "🌟"
         print(f"    {i}. {emoji} {cat.upper()}")
     try:
-        choice = int(get_user_input("Select a category by number: "))
+        choice = int(get_user_input_in_lowercase("Select a category by number: "))
         if choice < 0 or choice >= len(categories):
             print("❌ Invalid choice. Please enter a valid number.")
             return {}
